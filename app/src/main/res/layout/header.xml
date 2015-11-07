@@ -6,7 +6,8 @@
     android:padding="16dp"
     android:orientation="vertical"
     android:gravity="bottom"
-    android:background="@android:color/holo_blue_dark">
+    android:background="@android:color/holo_blue_dark"
+    >
 
     <TextView
         android:layout_width="match_parent"

@@ -1,42 +1,56 @@
 package com.example.ehc.myapplication;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Bundle;
+import android.provider.Settings;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
+import android.view.View;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.HeaderViewListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.app.PendingIntent;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandClientManager;
 import com.microsoft.band.BandException;
 import com.microsoft.band.BandInfo;
+import com.microsoft.band.BandIOException;
 import com.microsoft.band.ConnectionState;
-import com.microsoft.band.UserConsent;
 import com.microsoft.band.sensors.BandHeartRateEvent;
 import com.microsoft.band.sensors.BandHeartRateEventListener;
 import com.microsoft.band.sensors.HeartRateConsentListener;
-import android.os.Bundle;
-import android.telephony.SmsManager;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.EditText;
-import android.app.Activity;
-import android.app.AlertDialog;
+import com.microsoft.band.UserConsent;
+import com.microsoft.band.tiles.BandIcon;
+import com.microsoft.band.tiles.BandTile;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
-
-public class MainActivity extends ActionBarActivity implements ConnectionCallbacks, OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements ConnectionCallbacks, OnConnectionFailedListener {
 
     private BandClient client = null;
     private TextView txtStatus;
@@ -44,10 +58,14 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
     double elapsedTime;
     private boolean firstPoll = true;
     private ArrayList<Integer> BPMList;
+    private Toolbar toolbar;
+    private NavigationView mNavigationView;
+    private DrawerLayout mDrawerLayout;
     protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
     protected TextView mLatitudeText;
-    protected TextView mLongitudeText;
+    protected TextView  mLongitudeText;
+
 
     private BandHeartRateEventListener mHeartRateEventListener = new BandHeartRateEventListener() {
         @Override
@@ -69,15 +87,10 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
                 appendToUI(String.format("Heart Rate = %d beats per minute\n"
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
 
-                if (event.getHeartRate() > 100 && event.getHeartRate() < 125) {
+                if (event.getHeartRate() > 100 && event.getHeartRate() < 125){
                     appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
-
-                    if (calcAvgBPM(BPMList) > 100) {
-                        SMSContact();
-                    }
-
-                } else if (event.getHeartRate() >= 125) {
-                    panicAction();
+                }else if (event.getHeartRate() >= 125 ) {
+                        panicAction();
                 }
             }
 
@@ -125,28 +138,25 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
 //    }
 
     //calculates the average of all heart rate stored from the past 30s
-    private double calcAvgBPM(List<Integer> list) {
-        if (list.isEmpty() || list == null) {
-            return 0;
+    private void calcAvgBPM(List<Integer> list){
+        if (list.isEmpty() || list == null){
+            return;
         }
         int sum = 0;
         int n = list.size();
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++){
             sum += list.get(i);
         }
 
         double avgBPM = (double) sum / n;
 
-        if (avgBPM > 125) AlertContact();
+        if (avgBPM > 125.0) alertContact();
         else firstPoll = !firstPoll;
-
-        return avgBPM;
     }
 
-    private void SMSContact() {
-        SmsManager.getDefault().sendTextMessage("416-453-9845", null, "ALERT: Heart Rate rising, in danger zone.", null, null);
+    private void alertContact(){
 
-    };
+    }
 
 
 
@@ -154,12 +164,124 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         buildGoogleApiClient();
+
         txtStatus = (TextView) findViewById(R.id.txtStatus);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final ActionBar ab = getSupportActionBar();
+        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+        ab.setDisplayHomeAsUpEnabled(true);
+
+        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //setting up selected item listener
+        mNavigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        menuItem.setChecked(true);
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    }
+                });
+
+
+        if (mNavigationView != null) {
+            setupDrawerContent(mNavigationView);
+        }
+
 //        BandInfo[] pairedBands = BandClientManager.getInstance().getPairedBands();
 //        BandClient bandClient = BandClientManager.getInstance().create(getActivity(), pairedBands[0]);
         final WeakReference<Activity> reference = new WeakReference<Activity>(this);
         new HeartRateConsentTask().execute(reference);
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+
+        addItemsRunTime(navigationView);
+
+        //setting up selected item listener
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        menuItem.setChecked(true);
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    }
+                });
+    }
+
+    private void addItemsRunTime(NavigationView navigationView) {
+
+        //adding items run time
+        final Menu menu = navigationView.getMenu();
+        for (int i = 1; i <= 3; i++) {
+            menu.add("Runtime item "+ i);
+        }
+
+        // adding a section and items into it
+        final SubMenu subMenu = menu.addSubMenu("SubMenu Title");
+        for (int i = 1; i <= 2; i++) {
+            subMenu.add("SubMenu Item " + i);
+        }
+
+        // refreshing navigation drawer adapter
+        for (int i = 0, count = mNavigationView.getChildCount(); i < count; i++) {
+            final View child = mNavigationView.getChildAt(i);
+            if (child != null && child instanceof ListView) {
+                final ListView menuView = (ListView) child;
+                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
+                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
+                wrapped.notifyDataSetChanged();
+            }
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        if (isNavDrawerOpen()) {
+            closeNavDrawer();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    protected boolean isNavDrawerOpen() {
+        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
+    }
+
+    protected void closeNavDrawer() {
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        switch (id) {
+
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+
+            case R.id.action_settings:
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -168,6 +290,7 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
     }
 
     private void panicAction(){
