@@ -2,6 +2,7 @@ package com.example.ehc.myapplication;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.design.widget.NavigationView;
@@ -20,7 +21,12 @@ import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+<<<<<<< HEAD
 
+=======
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.location.LocationServices;
+>>>>>>> 45390dad05f25487875fa469d95c9e6ff76ff2b2
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandClientManager;
 import com.microsoft.band.BandException;
@@ -34,13 +40,18 @@ import com.microsoft.band.UserConsent;
 import com.microsoft.band.tiles.BandIcon;
 import com.microsoft.band.tiles.BandTile;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity implements ConnectionCallbacks, OnConnectionFailedListener {
 
     private BandClient client = null;
     private TextView txtStatus;
@@ -48,8 +59,15 @@ public class MainActivity extends Activity {
     double elapsedTime;
     private boolean firstPoll = true;
     private ArrayList<Integer> BPMList;
+<<<<<<< HEAD
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
+=======
+    protected GoogleApiClient mGoogleApiClient;
+    protected Location mLastLocation;
+    protected TextView mLatitudeText;
+    protected TextView  mLongitudeText;
+>>>>>>> 45390dad05f25487875fa469d95c9e6ff76ff2b2
 
     private BandHeartRateEventListener mHeartRateEventListener = new BandHeartRateEventListener() {
         @Override
@@ -148,8 +166,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+<<<<<<< HEAD
 
 
+=======
+        buildGoogleApiClient();
+>>>>>>> 45390dad05f25487875fa469d95c9e6ff76ff2b2
         txtStatus = (TextView) findViewById(R.id.txtStatus);
 
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -176,6 +198,7 @@ public class MainActivity extends Activity {
         new HeartRateConsentTask().execute(reference);
     }
 
+<<<<<<< HEAD
     private void setupDrawerContent(NavigationView navigationView) {
 
         addItemsRunTime(navigationView);
@@ -258,9 +281,37 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+=======
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+>>>>>>> 45390dad05f25487875fa469d95c9e6ff76ff2b2
     }
 
     private void panicAction(){
+
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
 
