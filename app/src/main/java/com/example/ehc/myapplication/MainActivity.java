@@ -2,10 +2,14 @@ package com.example.ehc.myapplication;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.microsoft.band.BandClient;
@@ -20,22 +24,70 @@ import com.microsoft.band.sensors.HeartRateConsentListener;
 import com.microsoft.band.UserConsent;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     private BandClient client = null;
     private TextView txtStatus;
+    private long tStart, tStop, tDelta;
+    double elapsedTime;
+    private boolean firstPoll = true;
+    private ArrayList<Integer> BPMList;
 
     private BandHeartRateEventListener mHeartRateEventListener = new BandHeartRateEventListener() {
         @Override
         public void onBandHeartRateChanged(final BandHeartRateEvent event) {
             if (event != null) {
+                if (firstPoll) {
+                    tStart = System.currentTimeMillis();
+                    BPMList = new ArrayList<>();
+                    firstPoll = !firstPoll;
+                }
+                tStop = System.currentTimeMillis();
+                tDelta = tStop - tStart;
+                elapsedTime = tDelta / 1000.0;
+                BPMList.add(event.getHeartRate());
+                //if the elapsed time exceeds 30s, calculate the average bpm
+                Log.v("elapsedTime", "time = " + elapsedTime);
+                if (elapsedTime >= 30.00) calcAvgBPM(BPMList);
+
                 appendToUI(String.format("Heart Rate = %d beats per minute\n"
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
+
+                txtStatus.setText(elapsedTime + " s ");
+                if (event.getHeartRate() > 100 && event.getHeartRate() < 125){
+                    appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
+                }else if (event.getHeartRate() >= 125 ) {
+                        panicAction();
+                }
             }
+
         }
     };
+
+
+    //calculates the average of all heart rate stored from the past 30s
+    private void calcAvgBPM(List<Integer> list){
+        if (list.isEmpty() || list == null){
+        }
+        int sum = 0;
+        int n = list.size();
+        for (int i = 0; i < n; i++){
+            sum += list.get(i);
+        }
+
+        double avgBPM = (double) sum / n;
+        if (avgBPM > 125)
+        alertContact();
+        else firstPoll = !firstPoll;
+    }
+
+    private void alertContact(){
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +99,10 @@ public class MainActivity extends ActionBarActivity {
 //        BandClient bandClient = BandClientManager.getInstance().create(getActivity(), pairedBands[0]);
         final WeakReference<Activity> reference = new WeakReference<Activity>(this);
         new HeartRateConsentTask().execute(reference);
+    }
+
+    private void panicAction(){
+
     }
 
     private class HeartRateSubscriptionTask extends AsyncTask<Void, Void, Void> {
@@ -73,7 +129,7 @@ public class MainActivity extends ActionBarActivity {
                         exceptionMessage = "Microsoft Health BandService is not available. Please make sure Microsoft Health is installed and that you have the correct permissions.\n";
                         break;
                     default:
-                        exceptionMessage = "Unknown error occured: " + e.getMessage() + "\n";
+                        exceptionMessage = "Unknown error occurred: " + e.getMessage() + "\n";
                         break;
                 }
                 appendToUI(exceptionMessage);
