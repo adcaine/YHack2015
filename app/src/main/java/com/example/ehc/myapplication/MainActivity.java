@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                         SMSAction();
                     }
 
-                } else if (event.getHeartRate() >= 135) {
+                } else if (event.getHeartRate() >= 70) {
                     AlertAction();                                      // contact emergency contact as soon as heart rate >= 135
                 }
             }
@@ -155,17 +155,20 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
     }
 
     private void SMSAction() {
-        SmsManager.getDefault().sendTextMessage("PHONE NUMBER HERE", null, "ALERT: Heart Rate rising, in danger zone.", null, null);
-    };
+        SmsManager.getDefault().sendTextMessage(getContactNumber(), null, "ALERT: I need help, high heart rate.", null, null);
+    }
 
 
     private void AlertAction(){
         Intent phoneIntent = new Intent(Intent.ACTION_CALL);
-        phoneIntent.setData(Uri.parse("PHONE NUMBER"));
-    };
+        phoneIntent.setData(Uri.parse(getContactNumber()));
+    }
 
 
-
+    private String getContactNumber(){
+        //TODO get the specified phone number
+        return "";
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
