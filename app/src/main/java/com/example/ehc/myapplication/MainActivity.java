@@ -1,7 +1,9 @@
 package com.example.ehc.myapplication;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -10,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -18,7 +21,6 @@ import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.telephony.SmsManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -77,15 +79,15 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                 appendToUI(String.format("Heart Rate = %d beats per minute\n"
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
 
-                if (event.getHeartRate() > 100 && event.getHeartRate() < 125) {
+                if (event.getHeartRate() > 120 && event.getHeartRate() < 135) {
                     appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
 
-                    if (calcAvgBPM(BPMList) > 100) {
-                        SMSContact();
+                    if (calcAvgBPM(BPMList) > 120 ) {                   // send SMS if AVG heart rate is > 120
+                        SMSAction();
                     }
 
-                } else if (event.getHeartRate() >= 125) {
-                    panicAction();
+                } else if (event.getHeartRate() >= 135) {
+                    AlertAction();                                      // contact emergency contact as soon as heart rate >= 135
                 }
             }
 
@@ -146,22 +148,21 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
 
         double avgBPM = (double) sum / n;
 
-        if (avgBPM > 125) AlertContact();
+        if (avgBPM > 135) AlertAction();
         else firstPoll = !firstPoll;
 
         return avgBPM;
     }
 
-    private void SMSContact() {
-        SmsManager.getDefault().sendTextMessage("416-453-9845", null, "ALERT: Heart Rate rising, in danger zone.", null, null);
-
+    private void SMSAction() {
+        SmsManager.getDefault().sendTextMessage("PHONE NUMBER HERE", null, "ALERT: Heart Rate rising, in danger zone.", null, null);
     };
 
 
-    private void AlertContact(){
-
-
-    }
+    private void AlertAction(){
+        Intent phoneIntent = new Intent(Intent.ACTION_CALL);
+        phoneIntent.setData(Uri.parse("PHONE NUMBER"));
+    };
 
 
 
@@ -295,10 +296,6 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-
-    }
-
-    private void panicAction(){
 
     }
 
