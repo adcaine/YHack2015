@@ -1,6 +1,7 @@
 package com.example.ehc.myapplication;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
@@ -22,10 +23,13 @@ import com.microsoft.band.sensors.BandHeartRateEvent;
 import com.microsoft.band.sensors.BandHeartRateEventListener;
 import com.microsoft.band.sensors.HeartRateConsentListener;
 import com.microsoft.band.UserConsent;
+import com.microsoft.band.tiles.BandIcon;
+import com.microsoft.band.tiles.BandTile;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 public class MainActivity extends Activity {
@@ -68,6 +72,45 @@ public class MainActivity extends Activity {
         }
     };
 
+    private void CreateButton() {
+        try {
+// get the current set of tiles
+            List<BandTile> tiles =
+                    bandClient.getBandTileManager().getTiles().await();
+        } catch (BandException e) {
+// handle BandException
+        } catch (InterruptedException e) {
+
+// handle InterruptedException
+// }
+            // Create the small and tile icons from writable bitmaps.
+// Small icons are 24x24 pixels.
+            Bitmap smallIconBitmap = Bitmap.createBitmap(24, 24, null);
+            BandIcon smallIcon = BandIcon.toBandIcon(smallIconBitmap);
+// Tile icons are 46x46 pixels for Microsoft Band 1 and 48x48 pixels
+// for Microsoft Band 2.
+            Bitmap tileIconBitmap = Bitmap.createBitmap(46, 46, null);
+            BandIcon tileIcon = BandIcon.toBandIcon(tileIconBitmap);
+// create a new UUID for the tile
+            UUID tileUuid = UUID.randomUUID();
+// create a new BandTile using the builder
+// add optional small icon
+// enable badging (the count of unread messages)
+            BandTile tile = new BandTile.Builder(tileUuid, "YHack", tileIcon)
+                    .setTileSmallIcon(smallIcon).setBadgingEnabled(true).build();
+            tile.IsBadingEnabled = true;
+            try {
+                if (bandClient.getBandTileManager().addTile(getActivity(),
+                        tile).await()) {
+// do work if the tile was successfully created
+                }
+            } catch (BandException e) {
+// handle BandException
+            } catch (InterruptedException e) {
+// handle InterruptedException
+            }
+        }
+    }
 
     //calculates the average of all heart rate stored from the past 30s
     private void calcAvgBPM(List<Integer> list){
@@ -88,6 +131,8 @@ public class MainActivity extends Activity {
     private void alertContact(){
 
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
