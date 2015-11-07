@@ -8,8 +8,11 @@ import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,12 +24,8 @@ import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-<<<<<<< HEAD
-
-=======
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.location.LocationServices;
->>>>>>> 45390dad05f25487875fa469d95c9e6ff76ff2b2
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandClientManager;
 import com.microsoft.band.BandException;
@@ -51,7 +50,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class MainActivity extends ActionBarActivity implements ConnectionCallbacks, OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements ConnectionCallbacks, OnConnectionFailedListener {
 
     private BandClient client = null;
     private TextView txtStatus;
@@ -59,15 +58,14 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
     double elapsedTime;
     private boolean firstPoll = true;
     private ArrayList<Integer> BPMList;
-<<<<<<< HEAD
+    private Toolbar toolbar;
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
-=======
     protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
     protected TextView mLatitudeText;
     protected TextView  mLongitudeText;
->>>>>>> 45390dad05f25487875fa469d95c9e6ff76ff2b2
+
 
     private BandHeartRateEventListener mHeartRateEventListener = new BandHeartRateEventListener() {
         @Override
@@ -152,7 +150,7 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
 
         double avgBPM = (double) sum / n;
 
-        if (avgBPM > 125) alertContact();
+        if (avgBPM > 125.0) alertContact();
         else firstPoll = !firstPoll;
     }
 
@@ -166,13 +164,17 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-<<<<<<< HEAD
 
-
-=======
         buildGoogleApiClient();
->>>>>>> 45390dad05f25487875fa469d95c9e6ff76ff2b2
+
         txtStatus = (TextView) findViewById(R.id.txtStatus);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final ActionBar ab = getSupportActionBar();
+        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+        ab.setDisplayHomeAsUpEnabled(true);
 
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -198,7 +200,6 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
         new HeartRateConsentTask().execute(reference);
     }
 
-<<<<<<< HEAD
     private void setupDrawerContent(NavigationView navigationView) {
 
         addItemsRunTime(navigationView);
@@ -281,14 +282,15 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
         }
 
         return super.onOptionsItemSelected(item);
-=======
+    }
+
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
->>>>>>> 45390dad05f25487875fa469d95c9e6ff76ff2b2
+
     }
 
     private void panicAction(){
