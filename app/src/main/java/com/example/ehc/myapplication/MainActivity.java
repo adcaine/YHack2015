@@ -1,43 +1,39 @@
 package com.example.ehc.myapplication;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
+import android.support.v7.app.ActionBarActivity;
 import android.widget.TextView;
+import android.app.PendingIntent;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandClientManager;
 import com.microsoft.band.BandException;
 import com.microsoft.band.BandInfo;
-import com.microsoft.band.BandIOException;
 import com.microsoft.band.ConnectionState;
+import com.microsoft.band.UserConsent;
 import com.microsoft.band.sensors.BandHeartRateEvent;
 import com.microsoft.band.sensors.BandHeartRateEventListener;
 import com.microsoft.band.sensors.HeartRateConsentListener;
-import com.microsoft.band.UserConsent;
-import com.microsoft.band.tiles.BandIcon;
-import com.microsoft.band.tiles.BandTile;
-
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.EditText;
+import android.app.Activity;
+import android.app.AlertDialog;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
 
 
 public class MainActivity extends ActionBarActivity implements ConnectionCallbacks, OnConnectionFailedListener {
@@ -51,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
     protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
     protected TextView mLatitudeText;
-    protected TextView  mLongitudeText;
+    protected TextView mLongitudeText;
 
     private BandHeartRateEventListener mHeartRateEventListener = new BandHeartRateEventListener() {
         @Override
@@ -73,10 +69,15 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
                 appendToUI(String.format("Heart Rate = %d beats per minute\n"
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
 
-                if (event.getHeartRate() > 100 && event.getHeartRate() < 125){
+                if (event.getHeartRate() > 100 && event.getHeartRate() < 125) {
                     appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
-                }else if (event.getHeartRate() >= 125 ) {
-                        panicAction();
+
+                    if (calcAvgBPM(BPMList) > 100) {
+                        SMSContact();
+                    }
+
+                } else if (event.getHeartRate() >= 125) {
+                    panicAction();
                 }
             }
 
@@ -124,25 +125,28 @@ public class MainActivity extends ActionBarActivity implements ConnectionCallbac
 //    }
 
     //calculates the average of all heart rate stored from the past 30s
-    private void calcAvgBPM(List<Integer> list){
-        if (list.isEmpty() || list == null){
-            return;
+    private double calcAvgBPM(List<Integer> list) {
+        if (list.isEmpty() || list == null) {
+            return 0;
         }
         int sum = 0;
         int n = list.size();
-        for (int i = 0; i < n; i++){
+        for (int i = 0; i < n; i++) {
             sum += list.get(i);
         }
 
         double avgBPM = (double) sum / n;
 
-        if (avgBPM > 125) alertContact();
+        if (avgBPM > 125) AlertContact();
         else firstPoll = !firstPoll;
+
+        return avgBPM;
     }
 
-    private void alertContact(){
+    private void SMSContact() {
+        SmsManager.getDefault().sendTextMessage("416-453-9845", null, "ALERT: Heart Rate rising, in danger zone.", null, null);
 
-    }
+    };
 
 
 
