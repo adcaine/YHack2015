@@ -32,8 +32,7 @@ import com.microsoft.band.tiles.BandTile;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import android.media.MediaPlayer;
-import android.media.AudioManager
+
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
