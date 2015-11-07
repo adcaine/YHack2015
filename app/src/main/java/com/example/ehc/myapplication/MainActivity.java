@@ -51,13 +51,12 @@ public class MainActivity extends Activity {
                 elapsedTime = tDelta / 1000.0;
                 BPMList.add(event.getHeartRate());
                 //if the elapsed time exceeds 30s, calculate the average bpm
-                Log.v("elapsedTime", "time = " + elapsedTime);
+
                 if (elapsedTime >= 30.00) calcAvgBPM(BPMList);
 
                 appendToUI(String.format("Heart Rate = %d beats per minute\n"
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
 
-                txtStatus.setText(elapsedTime + " s ");
                 if (event.getHeartRate() > 100 && event.getHeartRate() < 125){
                     appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
                 }else if (event.getHeartRate() >= 125 ) {
@@ -72,6 +71,7 @@ public class MainActivity extends Activity {
     //calculates the average of all heart rate stored from the past 30s
     private void calcAvgBPM(List<Integer> list){
         if (list.isEmpty() || list == null){
+            return;
         }
         int sum = 0;
         int n = list.size();
@@ -80,8 +80,8 @@ public class MainActivity extends Activity {
         }
 
         double avgBPM = (double) sum / n;
-        if (avgBPM > 125)
-        alertContact();
+
+        if (avgBPM > 125) alertContact();
         else firstPoll = !firstPoll;
     }
 
