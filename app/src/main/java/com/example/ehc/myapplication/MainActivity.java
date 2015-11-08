@@ -1,6 +1,8 @@
 package com.example.ehc.myapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -80,7 +82,27 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
 
                 if (event.getHeartRate() > 120 && event.getHeartRate() < 135) {
-                    appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
+                    //appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
+
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(null);
+                    builder1.setMessage("Heart Rate rising, in danger zone. Do you require assistance?");
+                    builder1.setCancelable(true);
+                    builder1.setPositiveButton("Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+                    builder1.setNegativeButton("No",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
+
 
                     if (calcAvgBPM(BPMList) > 120 ) {                   // send SMS if AVG heart rate is > 120
                         SMSAction();
