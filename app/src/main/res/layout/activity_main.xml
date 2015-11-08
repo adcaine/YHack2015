@@ -15,7 +15,8 @@
     <FrameLayout
         android:id="@+id/frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
     </FrameLayout>
 
@@ -32,5 +33,9 @@
         app:itemIconTint="@color/white"
         />
 
-
+    <!--<fragment android:name="com.example.ehc.myapplication.HomeFragment"-->
+        <!--android:id="@+id/home_fragment"-->
+        <!--android:layout_weight="1"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent" />-->
 </android.support.v4.widget.DrawerLayout>

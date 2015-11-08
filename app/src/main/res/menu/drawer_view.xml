@@ -16,16 +16,6 @@
             android:title="@string/nav_data"/>
 
     </group>
-    <item android:title="@string/nav_sub1_header">
-        <menu>
-            <item
-                android:id="@+id/my_device"
-                android:title="My Device" />
-            <item
-                android:id="@+id/disconnect_device"
-                android:title="Disconnect Device" />
-        </menu>
-    </item>
 
     <item android:title="@string/nav_sub2_header">
         <menu>

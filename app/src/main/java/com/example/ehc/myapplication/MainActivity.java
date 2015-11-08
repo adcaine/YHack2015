@@ -1,6 +1,7 @@
 package com.example.ehc.myapplication;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -8,11 +9,14 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceFragment;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
@@ -46,8 +50,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements ConnectionCallbacks, OnConnectionFailedListener {
-
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ConnectionCallbacks, OnConnectionFailedListener {
+    private static final String NAV_ITEM_ID = "navItemId";
+    private static final long DRAWER_CLOSE_DELAY_MS = 250;
+    private final HomeFragment homeFragment = new HomeFragment();
+    private final AboutFragment aboutFragment = new AboutFragment();
+    private final Help_Relax_Fragment relaxFragment = new Help_Relax_Fragment();
+    private final Help_Contact_Fragment contactFragment = new Help_Contact_Fragment();
+    private final Data_Fragment dataFragment = new Data_Fragment();
+    private final HelpFragment helpFragment = new HelpFragment();
+    private final PreferencesFragment preferenceFragment = new PreferencesFragment();
     private BandClient client = null;
     private TextView txtStatus, firstItem, secondItem;
     private long tStart, tStop, tDelta;
@@ -62,8 +74,9 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
     protected TextView mLatitudeText;
     protected TextView  mLongitudeText;
     private ListView listView;
-
-
+    private int mNavItemId;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private final Handler mDrawerActionHandler = new Handler();
 
     private BandHeartRateEventListener mHeartRateEventListener = new BandHeartRateEventListener() {
         @Override
@@ -88,19 +101,35 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                 if (event.getHeartRate() > 100 && event.getHeartRate() < 135) {
                     appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
 
-                    }else{
-                        appendToUI("Unabletofind");
-                        System.out.println("Unable");
-                    }
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(null);
+                    builder1.setMessage("Heart Rate rising, in danger zone. Do you require assistance?");
+                    builder1.setCancelable(true);
+                    builder1.setPositiveButton("Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+                    builder1.setNegativeButton("No",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
 
-                    if (calcAvgBPM(BPMList) > 120 ) {                   // send SMS if AVG heart rate is > 120
-//                        SMSAction();
-                    }
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
 
-                } else if (event.getHeartRate() >= 90) {
-                    AlertAction();                                      // contact emergency contact as soon as heart rate >= 135
                 }
+
+                if (calcAvgBPM(BPMList) > 120 ) {                   // send SMS if AVG heart rate is > 120
+//                        SMSAction();
+                }
+
+            } else if (event.getHeartRate() >= 90) {
+                AlertAction();                                      // contact emergency contact as soon as heart rate >= 135
             }
+        }
     };
 
 
@@ -171,11 +200,11 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
     private void AlertAction(){
         Intent phoneIntent = new Intent(Intent.ACTION_CALL);
         phoneIntent.setData(Uri.parse(getContactNumber()));
+        System.out.println(Uri.parse(getContactNumber()));
     }
 
 
     private String getContactNumber(){
-        //TODO get the specified phone number
         return "16477709721";
     }
     @Override
@@ -185,6 +214,11 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
 
         buildGoogleApiClient();
 
+        if (null == savedInstanceState) {
+            mNavItemId = R.id.nav_home;
+        } else {
+            mNavItemId = savedInstanceState.getInt(NAV_ITEM_ID);
+        }
 
         txtStatus = (TextView) findViewById(R.id.txtStatus);
         firstItem = (TextView) findViewById(R.id.firstListItem);
@@ -197,36 +231,20 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
-
-
-
+        //listen for navigation events
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //setting up selected item listener
-        mNavigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        mDrawerLayout.closeDrawers();
 
-                        switch (menuItem.getItemId()) {
-                            case R.id.nav_home:
-                                Toast.makeText(getApplicationContext(), "Home is clicked", Toast.LENGTH_LONG).show();
-                                ContentFragment fragment = new ContentFragment();
-                                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                                fragmentTransaction.replace(R.id.frame, fragment);
-                                fragmentTransaction.commit();
-                                return true;
-                            default: return true;
-                        }
-                    }
-                });
+        mNavigationView.getMenu().findItem(mNavItemId).setChecked(true);
 
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.open,
+                R.string.close);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
 
-        if (mNavigationView != null) {
-            setupDrawerContent(mNavigationView);
-        }
+        navigate(mNavItemId);
 
 //        BandInfo[] pairedBands = BandClientManager.getInstance().getPairedBands();
 //        BandClient bandClient = BandClientManager.getInstance().create(getActivity(), pairedBands[0]);
@@ -234,55 +252,60 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
         new HeartRateConsentTask().execute(reference);
     }
 
-    private void setupDrawerContent(NavigationView navigationView) {
+    private void navigate(final int itemId) {
+        switch (itemId) {
+            case R.id.nav_home:
+               getFragmentManager().beginTransaction().replace(R.id.frame, homeFragment).commit(); break;
+            case R.id.about:
+                getFragmentManager().beginTransaction().replace(R.id.frame, aboutFragment).commit(); break;
+            case R.id.nav_help_relax:
+                getFragmentManager().beginTransaction().replace(R.id.frame, relaxFragment).commit(); break;
+            case R.id.nav_help_contact:
+                getFragmentManager().beginTransaction().replace(R.id.frame, contactFragment).commit(); break;
+            case R.id.nav_data:
+                getFragmentManager().beginTransaction().replace(R.id.frame, dataFragment).commit(); break;
+            case R.id.help:
+                getFragmentManager().beginTransaction().replace(R.id.frame, helpFragment).commit(); break;
+            case R.id.preferences:
+                getFragmentManager().beginTransaction().replace(R.id.frame, preferenceFragment).commit(); break;
+            default:
+                //skip
+                break;
+        }
 
-        addItemsRunTime(navigationView);
 
-        //setting up selected item listener
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        mDrawerLayout.closeDrawers();
-                        switch (menuItem.getItemId()) {
-                            case android.R.id.home:
-                                Toast.makeText(getApplicationContext(), "home selected in menu", Toast.LENGTH_LONG);
-                                mDrawerLayout.openDrawer(GravityCompat.START);
-                                return true;
-                            default:
-                                return true;
-                        }
-                    }
-
-
-                });
     }
 
-    private void addItemsRunTime(NavigationView navigationView) {
-
-        //adding items run time
-        final Menu menu = navigationView.getMenu();
-        for (int i = 1; i <= 3; i++) {
-            menu.add("Runtime item "+ i);
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == android.support.v7.appcompat.R.id.home) {
+            return mDrawerToggle.onOptionsItemSelected(item);
         }
+        return super.onOptionsItemSelected(item);
+    }
 
-        // adding a section and items into it
-        final SubMenu subMenu = menu.addSubMenu("SubMenu Title");
-        for (int i = 1; i <= 2; i++) {
-            subMenu.add("SubMenu Item " + i);
-        }
+    @Override
+    public boolean onNavigationItemSelected(final MenuItem menuItem) {
+        // update highlighted item in the navigation menu
+        menuItem.setChecked(true);
+        mNavItemId = menuItem.getItemId();
 
-        // refreshing navigation drawer adapter
-        for (int i = 0, count = mNavigationView.getChildCount(); i < count; i++) {
-            final View child = mNavigationView.getChildAt(i);
-            if (child != null && child instanceof ListView) {
-                final ListView menuView = (ListView) child;
-                final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
-                final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
-                wrapped.notifyDataSetChanged();
+        // allow some time after closing the drawer before performing real navigation
+        // so the user can see what is happening
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        mDrawerActionHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                navigate(menuItem.getItemId());
             }
-        }
+        }, DRAWER_CLOSE_DELAY_MS);
+        return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(NAV_ITEM_ID, mNavItemId);
     }
 
     @Override
@@ -309,26 +332,6 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-
-        switch (id) {
-
-            case android.R.id.home:
-                Toast.makeText(getApplicationContext(),"home selected",Toast.LENGTH_LONG);
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-
-            case R.id.action_settings:
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 
 
     protected synchronized void buildGoogleApiClient() {

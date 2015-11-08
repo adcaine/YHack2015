@@ -18,4 +18,11 @@
     <string name="nav_sub2_item_1">Preferences</string>
     <string name="nav_sub2_item_2">About</string>
     <string name="nav_sub2_item_3">Help</string>
+    <string name="service_not_available">Service not available</string>
+    <string name="invalid_lat_long_used">Invalid longitude/latitude</string>
+    <string name="title_activity_lists">Lists</string>
+
+    <string name="open">open navigation drawer</string>
+    <string name="close">close navigation drawer</string>
+
 </resources>
