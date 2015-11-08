@@ -1,7 +1,6 @@
 package com.example.ehc.myapplication;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
