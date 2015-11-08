@@ -1,12 +1,16 @@
 package com.example.ehc.myapplication;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -21,6 +25,7 @@ import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -45,7 +50,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements ConnectionCallbacks, OnConnectionFailedListener {
 
     private BandClient client = null;
-    private TextView txtStatus;
+    private TextView txtStatus, firstItem, secondItem;
     private long tStart, tStop, tDelta;
     double elapsedTime;
     private boolean firstPoll = true;
@@ -57,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
     protected Location mLastLocation;
     protected TextView mLatitudeText;
     protected TextView  mLongitudeText;
+    private ListView listView;
+
 
 
     private BandHeartRateEventListener mHeartRateEventListener = new BandHeartRateEventListener() {
@@ -79,19 +86,22 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                 appendToUI(String.format("Heart Rate = %d beats per minute\n"
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
 
-                if (event.getHeartRate() > 120 && event.getHeartRate() < 135) {
+                if (event.getHeartRate() > 100 && event.getHeartRate() < 135) {
                     appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
 
-                    if (calcAvgBPM(BPMList) > 120 ) {                   // send SMS if AVG heart rate is > 120
-                        SMSAction();
+                    }else{
+                        appendToUI("Unabletofind");
+                        System.out.println("Unable");
                     }
 
-                } else if (event.getHeartRate() >= 70) {
+                    if (calcAvgBPM(BPMList) > 120 ) {                   // send SMS if AVG heart rate is > 120
+//                        SMSAction();
+                    }
+
+                } else if (event.getHeartRate() >= 90) {
                     AlertAction();                                      // contact emergency contact as soon as heart rate >= 135
                 }
             }
-
-        }
     };
 
 
@@ -154,9 +164,9 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
         return avgBPM;
     }
 
-    private void SMSAction() {
-        SmsManager.getDefault().sendTextMessage(getContactNumber(), null, "ALERT: I need help, high heart rate.", null, null);
-    }
+//    private void SMSAction() {
+//        SmsManager.getDefault().sendTextMessage(getContactNumber(), null, "ALERT: I need help, high heart rate.", null, null);
+//    }
 
 
     private void AlertAction(){
@@ -167,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
 
     private String getContactNumber(){
         //TODO get the specified phone number
-        return "";
+        return "16477709721";
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,7 +186,10 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
 
         buildGoogleApiClient();
 
+
         txtStatus = (TextView) findViewById(R.id.txtStatus);
+        firstItem = (TextView) findViewById(R.id.firstListItem);
+        secondItem = (TextView) findViewById(R.id.secondListItem);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -184,6 +197,9 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
         final ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
+
+
+
 
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -194,7 +210,17 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
                         mDrawerLayout.closeDrawers();
-                        return true;
+
+                        switch (menuItem.getItemId()) {
+                            case R.id.nav_home:
+                                Toast.makeText(getApplicationContext(), "Home is clicked", Toast.LENGTH_LONG).show();
+                                ContentFragment fragment = new ContentFragment();
+                                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                                fragmentTransaction.replace(R.id.frame, fragment);
+                                fragmentTransaction.commit();
+                                return true;
+                            default: return true;
+                        }
                     }
                 });
 
@@ -220,8 +246,17 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
                         mDrawerLayout.closeDrawers();
-                        return true;
+                        switch (menuItem.getItemId()) {
+                            case android.R.id.home:
+                                Toast.makeText(getApplicationContext(), "home selected in menu", Toast.LENGTH_LONG);
+                                mDrawerLayout.openDrawer(GravityCompat.START);
+                                return true;
+                            default:
+                                return true;
+                        }
                     }
+
+
                 });
     }
 
@@ -250,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
             }
         }
     }
+
     @Override
     public void onBackPressed() {
         if (isNavDrawerOpen()) {
@@ -283,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
         switch (id) {
 
             case android.R.id.home:
+                Toast.makeText(getApplicationContext(),"home selected",Toast.LENGTH_LONG);
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
 
@@ -292,6 +329,8 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -334,7 +373,9 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                                 + " Please press the Heart Rate Consent button.\n");
                     }
                 } else {
+
                     appendToUI("Band isn't connected. Please make sure bluetooth is on and the band is in range.\n");
+
                 }
             } catch (BandException e) {
                 String exceptionMessage="";
@@ -374,6 +415,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                     }
                 } else {
                     appendToUI("Band isn't connected. Please make sure bluetooth is on and the band is in range.\n");
+
                 }
             } catch (BandException e) {
                 String exceptionMessage="";

@@ -1,33 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_drawer_home"
-            android:title="@string/nav_home" />
+            android:title="@string/nav_home"
+            android:icon="@drawable/ic_drawer_home"/>
         <item
-            android:id="@+id/nav_about"
-            android:icon="@drawable/ic_drawer_about"
-            android:title="@string/nav_about" />
+            android:id="@+id/nav_help_relax"
+            android:title="@string/nav_help_relax" />
         <item
-            android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_drawer_settings"
-            android:title="@string/nav_preferences" />
+            android:id="@+id/nav_help_contact"
+            android:title="@string/nav_help_contact"/>
+        <item
+            android:id="@+id/nav_data"
+            android:title="@string/nav_data"/>
 
-        <item
-            android:id="@+id/navigation_subheader"
-            android:title="@string/nav_sub_header">
-            <menu>
-                <item
-                    android:id="@+id/navigation_sub_item_1"
-                    android:icon="@drawable/ic_drawer_about"
-                    android:title="@string/nav_sub_item_1" />
-                <item
-                    android:id="@+id/navigation_sub_item_2"
-                    android:icon="@drawable/ic_drawer_home"
-                    android:title="@string/nav_sub_item_2" />
-            </menu>
-        </item>
     </group>
+    <item android:title="@string/nav_sub1_header">
+        <menu>
+            <item
+                android:id="@+id/my_device"
+                android:title="My Device" />
+            <item
+                android:id="@+id/disconnect_device"
+                android:title="Disconnect Device" />
+        </menu>
+    </item>
+
+    <item android:title="@string/nav_sub2_header">
+        <menu>
+            <item
+                android:id="@+id/preferences"
+                android:title="@string/nav_sub2_item_1"
+                android:icon="@drawable/ic_drawer_settings"/>
+
+            <item
+                android:id="@+id/about"
+                android:title="@string/nav_sub2_item_2"
+                android:icon="@drawable/ic_drawer_about"/>
+            <item
+                android:id="@+id/help"
+                android:title="@string/nav_sub2_item_3"
+                android:icon="@drawable/ic_help"/>
+        </menu>
+    </item>
 </menu>
