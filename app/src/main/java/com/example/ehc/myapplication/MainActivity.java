@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                 appendToUI(String.format("Heart Rate = %d beats per minute\n"
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
 
-                if (event.getHeartRate() > 120 && event.getHeartRate() < 135) {
+                if (event.getHeartRate() > 100) {
                     //appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
 
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(null);
