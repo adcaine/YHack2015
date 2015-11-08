@@ -12,6 +12,12 @@
     <!-- include your content layout -->
     <include layout="@layout/content_layout"/>
 
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 
     <!-- Navigation view -->
     <android.support.design.widget.NavigationView
@@ -22,8 +28,9 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/header"
         app:menu="@menu/drawer_view"
-        app:itemTextColor="@color/text"
-        app:itemIconTint="@color/black"
+        app:itemTextColor="@color/white"
+        app:itemIconTint="@color/white"
         />
+
 
 </android.support.v4.widget.DrawerLayout>

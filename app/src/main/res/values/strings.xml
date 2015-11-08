@@ -1,15 +1,21 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">APP</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
     <string name="nav_home">Home</string>
-    <string name="nav_preferences">Preferences</string>
+    <string name="nav_help_relax">Help me Relax</string>
+    <string name="nav_help_contact">Help me Contact</string>
+    <string name="nav_data">Data</string>
+
     <string name="nav_about">About</string>
     <string name="nav_help">Help</string>
 
-    <string name="nav_sub_header">Sub header</string>
-    <string name="nav_sub_item_1">Sub item 1</string>
-    <string name="nav_sub_item_2">Sub item 2</string>
+    <string name="nav_sub1_header">Device Settings</string>
+    <string name="nav_sub_item_1">Item 1</string>
+
+    <string name="nav_sub2_header">Settings</string>
+    <string name="nav_sub2_item_1">Preferences</string>
+    <string name="nav_sub2_item_2">About</string>
+    <string name="nav_sub2_item_3">Help</string>
 </resources>

@@ -81,62 +81,22 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                 appendToUI(String.format("Heart Rate = %d beats per minute\n"
                         + "Quality = %s\n", event.getHeartRate(), event.getQuality()));
 
-                if (event.getHeartRate() > 100) {
+                if (event.getHeartRate() > 120 && event.getHeartRate() < 135) {
                     //appendToUI(String.format("Heart Rate rising, in danger zone. Do you require assistance?"));
 
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(null);
                     builder1.setMessage("Heart Rate rising, in danger zone. Do you require assistance?");
                     builder1.setCancelable(true);
-                    AlertDialog.Builder yes = builder1.setPositiveButton("Yes",
+                    builder1.setPositiveButton("Yes",
                             new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int whichButton) {
+                                public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
-
-                                    //Give user 4 options
-                                    AlertDialog levelDialog = null;
-
-// Strings to Show In Dialog with Radio Buttons
-                                    final CharSequence[] items = {"Soothing Music ", "Breathing Exercises", "Text Emergency Contact", "Call Emergency Contact"};
-
-                                    // Creating and Building the Dialog
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(null);
-                                    builder.setTitle("Select from the options below");
-                                    final AlertDialog finalLevelDialog = levelDialog;
-                                    builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int item) {
-
-                                            switch (item) {
-                                                case 0:
-                                                    // Run the music playing method
-
-                                                    break;
-                                                case 1:
-                                                    // Play the breathing exercises GIF
-
-                                                    break;
-                                                case 2:
-                                                    // Send the text to a pre-loaded emergency contact
-                                                    SMSAction();
-                                                    break;
-                                                case 3:
-                                                    // Call the pre-set emergency contact
-                                                    AlertAction();
-                                                    break;
-                                            }
-                                            finalLevelDialog.dismiss();
-                                        }
-                                    });
-                                    levelDialog = builder.create();
-                                    levelDialog.show();
                                 }
                             });
                     builder1.setNegativeButton("No",
                             new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
+                                public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
-
                                 }
                             });
 
@@ -144,12 +104,11 @@ public class MainActivity extends AppCompatActivity implements ConnectionCallbac
                     alert11.show();
 
 
-                    if (calcAvgBPM(BPMList) > 100 && calcAvgBPM(BPMList) < 120){
-                        // send SMS if AVG heart rate is > 120
+                    if (calcAvgBPM(BPMList) > 120 ) {                   // send SMS if AVG heart rate is > 120
                         SMSAction();
                     }
 
-                } else if (event.getHeartRate() > 120) {
+                } else if (event.getHeartRate() >= 70) {
                     AlertAction();                                      // contact emergency contact as soon as heart rate >= 135
                 }
             }
