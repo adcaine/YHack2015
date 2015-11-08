@@ -1,8 +1,5 @@
 package com.example.ehc.myapplication;
 
-/**
- * Created by Sam on 2015-11-07.
- */
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
@@ -15,10 +12,10 @@ import java.util.ArrayList;
 public class DBHandler extends SQLiteOpenHelper{
 
     private static final int DATABASE_VERSION=1;
-    private static final String DATABASE_NAME = "panic.db";
+    private static final String DATABASE_NAME = "asmnts.db";
     public static final String TABLE_DATA = "data";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_LOCATION = "_work";
+    public static final String COLUMN_WORK = "_work";
     public static final String COLUMN_DATE = "_date";
 
     public DBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -29,7 +26,7 @@ public class DBHandler extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE " + TABLE_DATA + "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_LOCATION + " TEXT, " +COLUMN_DATE+ " TEXT "+
+                COLUMN_WORK + " TEXT, " +COLUMN_DATE+ " TEXT "+
                 ");";
         db.execSQL(query);
 
@@ -44,7 +41,7 @@ public class DBHandler extends SQLiteOpenHelper{
 
     public void addData(Data data){
         ContentValues values = new ContentValues();
-        values.put(COLUMN_LOCATION, data.get_location());
+        values.put(COLUMN_WORK, data.get_work());
         values.put(COLUMN_DATE, data.get_date());
 
         SQLiteDatabase db = getWritableDatabase();
@@ -55,7 +52,7 @@ public class DBHandler extends SQLiteOpenHelper{
 
     public void deleteData(String dataName){
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + TABLE_DATA + " WHERE " + COLUMN_LOCATION + "=\"" + dataName +"\";");
+        db.execSQL("DELETE FROM " + TABLE_DATA + " WHERE " + COLUMN_WORK+ "=\"" + dataName +"\";");
 
     }
 
@@ -70,7 +67,7 @@ public class DBHandler extends SQLiteOpenHelper{
 
         while (!c.isAfterLast()){
             if(c.getString(c.getColumnIndex("_work"))!=null){
-                listItems.add("\n"+(c.getString(c.getColumnIndex("_location"))).toUpperCase()+"\n"+c.getString(c.getColumnIndex("_date"))+"\n");
+                listItems.add("\n"+(c.getString(c.getColumnIndex("_work"))).toUpperCase()+"\n"+c.getString(c.getColumnIndex("_date"))+"\n");
 
 
             }

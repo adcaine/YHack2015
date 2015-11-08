@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 public class Lists extends ListActivity {
 
     DBHandler dbHandler;
-    ArrayList<String> listItems= new ArrayList<>();
+    private static ArrayList<String> listItems= new ArrayList<>();
     ArrayAdapter<String> adapter;
 
 
@@ -42,6 +43,7 @@ public class Lists extends ListActivity {
 
 
         listItems = dbHandler.toArray();
+        Toast.makeText(this.getApplicationContext(), listItems.get(0).toString(),Toast.LENGTH_SHORT).show();
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
         setListAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -54,7 +56,9 @@ public class Lists extends ListActivity {
 
     }
 
-
+    public static ArrayList getListItems(){
+        return listItems;
+    }
 
 
     @Override

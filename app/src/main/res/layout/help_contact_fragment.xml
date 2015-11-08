@@ -2,20 +2,46 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="?attr/actionBarSize">
+    android:layout_marginTop="?attr/actionBarSize"
+    android:background="@color/fragment_background">
 
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="CONTACT"
+        android:text="CONTACT METHODS"
         android:padding="50dp"
         android:textColor="#fff"
-        android:background="@color/fragment_background"
+
         android:textSize="28sp"
         android:id="@+id/contact_fragment_text"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/contact_Btn1"
+        android:text="Call"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@id/contact_Btn1"
+        android:id="@+id/contact_Btn2"
+        android:text="Text"
+        />
+    <EditText
+        android:id="@+id/text_input"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:layout_below="@id/contact_Btn2"
+        />
 
 </RelativeLayout>

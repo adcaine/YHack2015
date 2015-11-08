@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="?attr/actionBarSize">
+    android:layout_marginTop="?attr/actionBarSize"
+    android:background="@color/fragment_background"
+    tools:context="com.example.ehc.myapplication.Lists">
 
-
-    <TextView
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="64dp"
+        >
+    </RelativeLayout>
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="DATA"
-        android:padding="50dp"
-        android:textColor="#fff"
-        android:background="@color/fragment_background"
-        android:textSize="28sp"
-        android:id="@+id/data_fragment_text"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-</RelativeLayout>
+        android:layout_height="wrap_content"
+        android:id="@android:id/list"
+        android:layout_gravity="right"
+        android:divider="#000000"
+        android:dividerHeight="1dp"
+        android:drawSelectorOnTop="false"
+        android:paddingTop="2dp"
+        android:footerDividersEnabled="false" />
+
+
+</LinearLayout>

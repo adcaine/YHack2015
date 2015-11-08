@@ -1,11 +1,10 @@
 package com.example.ehc.myapplication;
 
-/**
- * Created by Sam on 2015-11-07.
- */
+
+
 public class Data {
     private int _id;
-    private String _location;
+    private String _work;
     private String _date;
 
     public Data(){
@@ -13,11 +12,11 @@ public class Data {
     }
 
     public Data(String work){
-        this._location = work;
+        this._work = work;
     }
 
     public Data(String work, String date){
-        this._location = work;
+        this._work = work;
         this._date = date;
     }
 
@@ -25,8 +24,8 @@ public class Data {
         this._id = _id;
     }
 
-    public void set_location(String _location) {
-        this._location = _location;
+    public void set_work(String _work) {
+        this._work = _work;
     }
 
     public void set_date(String _date) {
@@ -37,8 +36,8 @@ public class Data {
         return _id;
     }
 
-    public String get_location() {
-        return _location;
+    public String get_work() {
+        return _work;
     }
 
     public String get_date() {

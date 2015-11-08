@@ -29,32 +29,15 @@
         android:layout_gravity="center">
 
         <TextView
-        android:id="@+id/txtStatus"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:text=""
-        android:textColor="@color/white"
-        android:layout_marginTop="?attr/actionBarSize"/>
-
-        <TextView
-            android:id="@+id/firstListItem"
-            android:layout_width="wrap_content"
-            android:layout_height="26dip"
-            android:layout_below="@id/txtStatus"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:text="Description"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/secondListItem"
-            android:layout_width="wrap_content"
+            android:id="@+id/txtStatus"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/firstListItem"
-            android:gravity="center_vertical"
-            android:text="Example application"
-            android:textSize="12sp" />
+            android:layout_centerVertical="true"
+            android:text=""
+            android:textStyle="bold"
+            android:textSize="35sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="?attr/actionBarSize"/>
 
 
 
